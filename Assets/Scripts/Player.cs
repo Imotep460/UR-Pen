@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -35,8 +36,8 @@ public class Player : MonoBehaviour
         playerBody.velocity = inputVector;
     }
 
-    public void moveX()
+    public void MoveX()
     {
-        //playerController.transform.position += ;
+
     }
 }
