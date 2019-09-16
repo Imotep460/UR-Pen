@@ -19,7 +19,6 @@ public class ViewManager : MonoBehaviour
 
     public void MoveX()
     {
-        
         Debug.LogFormat("the button was pressed!");
     }
 
