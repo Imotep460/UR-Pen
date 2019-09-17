@@ -17,10 +17,10 @@ public class ViewManager : MonoBehaviour
         SceneManager.LoadScene(viewName);
     }
 
-    public void MoveX()
-    {
-        Debug.LogFormat("the button was pressed!");
-    }
+    //public void MoveX()
+    //{
+    //    Debug.LogFormat("the button was pressed!");
+    //}
 
     public void Quit()
     {
