@@ -43,12 +43,15 @@ public class Simulation : MonoBehaviour
         // Rotate towards the targetRotation.
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         // Check if the distance between the gameObjects current position is within a certain distance of the targetPosition.
-        if (Vector3.Distance(transform.position, targetPosition) < .25)
+        if (Vector3.Distance(transform.position, targetPosition) < .01)
         {
             // Check to make sure the waypointIndex is NOT biger than the amount of waypoints in Transform[] waypoints.
             if (waypointIndex >= waypoints.Length - 1)
             {
+                // If the waypointIndex is bigger than or equal to the total amount of waypoints, then reset the waypoint index to 0. ie: ready to start over.
                 waypointIndex = 0;
+                // If the waypointIndex is bigger than or equal to the total amount of waypoints, then pause/freeze/stop time/progress.
+                Time.timeScale = 0;
             }
             else
             {
@@ -58,11 +61,6 @@ public class Simulation : MonoBehaviour
             targetPosition = waypoints[waypointIndex].position;
             // Set a new targetRotation.
             targetRotation = waypoints[waypointIndex].rotation;
-            if (waypointIndex > waypoints.Length - 1)
-            {
-                // Pause the screen/game/simulation.
-                Time.timeScale = 0;
-            }
         }
     }
 }

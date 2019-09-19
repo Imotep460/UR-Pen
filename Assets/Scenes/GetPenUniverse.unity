@@ -303,7 +303,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.06818199
+        value: 0.045454025
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -348,7 +348,7 @@ TrailRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_MinVertexDistance: 0.1
+  m_MinVertexDistance: 0.01
   m_Autodestruct: 0
   m_Emitting: 1
 --- !u!1001 &669174111
