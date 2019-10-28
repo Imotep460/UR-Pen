@@ -14,4 +14,10 @@ public class ViewManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void saveGame()
+    {
+        // Save the game to a file called "SaveGame.json"
+        SavingService.SaveGame("SaveGame");
+    }
 }

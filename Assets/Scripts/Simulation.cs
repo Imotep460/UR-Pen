@@ -41,7 +41,14 @@ public class Simulation : MonoBehaviour
         targetRotation = waypoints[0].rotation;
         // make sure the waypointIndex starts at 0.
         waypointIndex = 0;
+
+        //points = new List<Transform>();
+        //foreach (var item in collection)
+        //{
+        //    points.Add()
+        //}
     }
+
 
     // Update is called once per frame
     void Update()
@@ -54,7 +61,7 @@ public class Simulation : MonoBehaviour
         // Print out the current position of the pen tip. Updates every frame.
         positionText.text = string.Format("Position:\n{0}", transform.position);
         // Print ot the current rotation of the pen tip. Updates every frame
-        rotationText.text = string.Format("Rotation:\n{0}", transform.rotation);
+        rotationText.text = string.Format("Rotation:\n{0}", transform.rotation.eulerAngles);
 
         // Check if the distance between the gameObjects current position is within a certain distance of the targetPosition before moving on to the next waypoint.
         if (Vector3.Distance(transform.position, targetPosition) < .01)
@@ -75,6 +82,8 @@ public class Simulation : MonoBehaviour
             targetPosition = waypoints[waypointIndex].position;
             // Set a new targetRotation.
             targetRotation = waypoints[waypointIndex].rotation;
-        }
+
+            //points.Add(new transform.position(0, 0, 0), new Quaternion(0, 0, 0, 1), new Vector3());
+        }        
     }
 }
