@@ -240,7 +240,7 @@ public static class SavingService
             // Changes we made to the objects would revert to how they're definde in the original scene.
             // As a result, we need to run the code after the scene manager reports that a scene has finished loading.
 
-            // To do this, we create a new delegate that contains or object-loading code,
+            // To do this, we create a new delegate that contains our object-loading code,
             // and store that in LoadObjectsAfterSceneLoad.
             // This delegate is added to the SceneManager's sceneLoaded event,
             // which makes it run after the scene finished loading.

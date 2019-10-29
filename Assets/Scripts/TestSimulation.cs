@@ -4,19 +4,6 @@ using UnityEngine;
 
 public class TestSimulation : MonoBehaviour
 {
-    // Get location where data can safely be stored and loaded from.
-    public string PathForFilename(string filename)
-    {
-        // Application.persistentDataPath contains a path where we can safely store data.
-        var folderToStoreFilesIn = Application.persistentDataPath;
-
-        // System.IO.Path.Combine combines two paths, using the current system's directory seperator,
-        // ( \ on windows, / on just about every other platforms)
-        var path = System.IO.Path.Combine(folderToStoreFilesIn, filename);
-
-        return path;
-    }
-
     // Field for the Text object. Meant to represent the x, y, z position of the GameObject.
     // Serialized in order to make it easy to set in the editor.
     // Drag a TextMeshPro text object to this field in the inspector
@@ -26,8 +13,7 @@ public class TestSimulation : MonoBehaviour
     [SerializeField]
     private TMPro.TextMeshProUGUI rotationText;
 
-
-    // Index sed to navigate through the lists:
+    // Index used to navigate through the lists:
     private int waypointIndex;
     // Create list of vector3 positions
     private List<Vector3> pointsPosition = new List<Vector3>();
@@ -38,8 +24,6 @@ public class TestSimulation : MonoBehaviour
     private Vector3 targetPosition;
     // Field for the targetRotation/target Quarternion
     private Quaternion targetRotation;
-    // Field for the waypoints.
-    private Transform[] waypoints;
 
     // Field for movementSpeed variable to increase or decrease the movement speed of the GameObject.
     // If the movementSpeed is 0 then then GameObject will not move,
@@ -79,7 +63,7 @@ public class TestSimulation : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
         // Check if the GameObject is within a certain distance of the targetPosition
-        if (Vector3.Distance(transform.position, targetPosition) < .01f)
+        if (Vector3.Distance(transform.position, targetPosition) < .00001f)
         {
             new WaitForSeconds(1);
             // Check to make sure that the waypointIndex is NOT bigger than than the maximum number of vector3's in pointsPosition.
@@ -151,6 +135,9 @@ public class TestSimulation : MonoBehaviour
         pointsPosition.Add(new Vector3(1, 1, 1));
         pointsPosition.Add(new Vector3(2, 2, 2));
         pointsPosition.Add(new Vector3(3, 3, 3));
+        pointsPosition.Add(new Vector3(0, 0, 0));
+        pointsPosition.Add(new Vector3((float)7.5, 0, 0));
+        pointsPosition.Add(new Vector3(14, 0, 0));
         pointsRotation.Add(Quaternion.Euler(0, 0, 0));
         pointsRotation.Add(Quaternion.Euler(45, 0, 0));
         pointsRotation.Add(Quaternion.Euler(0, 0, 0));
@@ -158,6 +145,9 @@ public class TestSimulation : MonoBehaviour
         pointsRotation.Add(new Quaternion((float)0.45, 0, 0, 1));
         rotationsVector = new Vector3(25, 0, 0);
         pointsRotation.Add(Quaternion.Euler(rotationsVector));
+        pointsRotation.Add(Quaternion.Euler(0, 0, 0));
+        pointsRotation.Add(Quaternion.Euler(45, 0, 0));
+        pointsRotation.Add(Quaternion.Euler(-45, 0, 0));
     }
 
     //void generateLists()
