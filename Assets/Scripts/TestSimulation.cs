@@ -73,6 +73,20 @@ public class TestSimulation : MonoBehaviour
                 waypointIndex = 0;
                 // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then pause the game.
                 Time.timeScale = 0;
+                string point = "";
+                for (int i = 0; i < pointsPosition.Count; i++)
+                {
+                    float xp = pointsPosition[i].x;
+                    float yp = pointsPosition[i].y;
+                    float zp = pointsPosition[i].z;
+                    float xr = pointsRotation[i].eulerAngles.x;
+                    float yr = pointsRotation[i].eulerAngles.y;
+                    float zr = pointsRotation[i].eulerAngles.z;
+                    float wr = pointsRotation[i].w;
+
+                    point += string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}\n", xp, yp, zp, xr, yr, zr, wr);
+                }
+                Debug.Log(point);
             }
             else
             {
