@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,10 +16,11 @@ public class TestSimulation : MonoBehaviour
 
     // Index used to navigate through the lists:
     private int waypointIndex;
+
     // Create list of vector3 positions
-    private List<Vector3> pointsPosition = new List<Vector3>();
+    public List<Vector3> pointsPosition = new List<Vector3>();
     // Create list of Quaternion rotations;
-    private List<Quaternion> pointsRotation = new List<Quaternion>();
+    public List<Quaternion> pointsRotation = new List<Quaternion>();
 
     // Get the target Vector3.
     private Vector3 targetPosition;
@@ -35,11 +37,18 @@ public class TestSimulation : MonoBehaviour
     [SerializeField]
     private float rotationSpeed;
 
+    // To save the points I create a List<string> where I add a string by the following format:
+    // string.format(pointPosition.x, pointPosition.y, pointPosition.z, pointRotation.x, pointRotation.y, pointRotation.z, pointRotation.w)
+    public static List<string> pointsStringList = new List<string>();
+
     // Start is called before the first frame update
     void Start()
     {
         // Call to populateLists method at start to populate the ppintsPosition and pointsRotation lists.
         populateLists();
+        new WaitForSeconds(1);
+        // Build the list of strings so it's ready to be saved to the Json savefile later.
+        //buildStringList();
         // Make sure the waypointIndex is set to 0 at start
         waypointIndex = 0;
 
@@ -47,6 +56,8 @@ public class TestSimulation : MonoBehaviour
         targetPosition = pointsPosition[0];
         // Set the Start Quaternion rotation equal item 0 in pointsRotation list.
         targetRotation = pointsRotation[0];
+
+        Debug.Log(pointsStringList[0]);
     }
 
     // Update is called once per frame
@@ -73,20 +84,6 @@ public class TestSimulation : MonoBehaviour
                 waypointIndex = 0;
                 // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then pause the game.
                 Time.timeScale = 0;
-                string point = "";
-                for (int i = 0; i < pointsPosition.Count; i++)
-                {
-                    float xp = pointsPosition[i].x;
-                    float yp = pointsPosition[i].y;
-                    float zp = pointsPosition[i].z;
-                    float xr = pointsRotation[i].eulerAngles.x;
-                    float yr = pointsRotation[i].eulerAngles.y;
-                    float zr = pointsRotation[i].eulerAngles.z;
-                    float wr = pointsRotation[i].w;
-
-                    point += string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}\n", xp, yp, zp, xr, yr, zr, wr);
-                }
-                Debug.Log(point);
             }
             else
             {
@@ -138,7 +135,10 @@ public class TestSimulation : MonoBehaviour
     }
 
     /// <summary>
-    /// Populate the pointsPosition list with Vector3's and the pointsRotation with Quaternion's 
+    /// Populate the pointsPosition list with Vector3's and the pointsRotation with Quaternion's with custom data.
+    /// Recomended to call this method in Start/Awake, for a smooth startup.
+    /// Do NOT use with a working save system.
+    /// For testing purposes.
     /// </summary>
     void populateLists()
     {
@@ -162,6 +162,24 @@ public class TestSimulation : MonoBehaviour
         pointsRotation.Add(Quaternion.Euler(0, 0, 0));
         pointsRotation.Add(Quaternion.Euler(45, 0, 0));
         pointsRotation.Add(Quaternion.Euler(-45, 0, 0));
+    }
+
+    public void buildStringList()
+    {
+        for (int i = 0; i < pointsPosition.Count; i++)
+        {
+            // Separate the different values in each Vector3 in pointsPosition and Quaternion in pointsRotation
+            float xp = pointsPosition[i].x;
+            float yp = pointsPosition[i].y;
+            float zp = pointsPosition[i].z;
+            float xr = pointsRotation[i].x;
+            float yr = pointsRotation[i].y;
+            float zr = pointsRotation[i].z;
+            float wr = pointsRotation[i].w;
+
+            // Create and format a string and add it to the points list.
+            pointsStringList.Add(string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}", xp, yp, zp, xr, yr, zr, wr));
+        }
     }
 
     //void generateLists()

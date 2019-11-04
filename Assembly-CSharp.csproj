@@ -74,8 +74,8 @@
     <Compile Include="Assets\LitJSON\src\LitJson\Netstandard15Polyfill.cs" />
     <Compile Include="Assets\LitJSON\src\LitJson\ParserToken.cs" />
     <Compile Include="Assets\Scripts\ButtonYUp.cs" />
-    <Compile Include="Assets\Scripts\PauseButton.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Points.cs" />
     <Compile Include="Assets\Scripts\SaveableBehavior.cs" />
     <Compile Include="Assets\Scripts\SavingService.cs" />
     <Compile Include="Assets\Scripts\SerializeTest.cs" />

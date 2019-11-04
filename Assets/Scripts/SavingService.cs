@@ -35,14 +35,16 @@ public static class SavingService
     // (Use an unexpected character "$" for the Save ID here to reduce the chance of collisions).
     private const string SAVEID_KEY = "$saveID";
 
+    private const string POINTS_STRING_KEY = "points";
+
     // A reference to the delegate that runs after the scene loads,
     // which performs the object state restoration.
     static UnityEngine.Events.UnityAction<Scene, LoadSceneMode>
         LoadObjectsAfterSceneLoad;
 
-    ///// <summary>
-    ///// Saves the game, and writes it to a file called fileName in the app's persistent data directory
-    ///// </summary>
+    /// <summary>
+    /// Saves the game, and writes it to a file called fileName in the app's persistent data directory
+    /// </summary>
     public static void SaveGame(string fileName)
     {
         // Create the JsonData that we will eventually write to the disk
@@ -117,6 +119,18 @@ public static class SavingService
 
         // Store the name of the active scene
         result[ACTIVE_SCENE_KEY] = SceneManager.GetActiveScene().name;
+
+        var points = new JsonData();
+
+        var pointCount = TestSimulation.pointsStringList.Count();
+
+        for (int i = 0; i < pointCount; i++)
+        {
+            var point = TestSimulation.pointsStringList[i];
+            points.Add(point);
+        }
+
+        result[POINTS_STRING_KEY] = points;
 
         // We've now finished generating the save data, and it's now time to write it to the disk.
 
@@ -230,6 +244,23 @@ public static class SavingService
             Debug.LogWarningFormat("Data at {0} does not specify an active scene.", dataPath);
         }
 
+        // Get the list of points.
+        var points = data[POINTS_STRING_KEY];
+        int pointsCount = points.Count;
+
+        if (pointsCount == 0)
+        {
+            Debug.LogWarningFormat("Data at {0} does not contain any points.");
+        }
+        else if (pointsCount > 0)
+        {
+            for (int i = 0; i < pointsCount; i++)
+            {
+                var point = (string)points[i];
+                TestSimulation.pointsStringList.Add(point);
+            }
+        }
+
         // Find all objects in the scene and load them.
         if (data.ContainsKey(OBJECTS_KEY))
         {
@@ -287,7 +318,7 @@ public static class SavingService
                 // but users are fine with this as they're already waiting for the scene to finish loading)
                 System.GC.Collect();
             };
-            // Register the object-loading code t run ater the scene loads.
+            // Register the object-loading code to run ater the scene loads.
             SceneManager.sceneLoaded += LoadObjectsAfterSceneLoad;
         }
         return true;
