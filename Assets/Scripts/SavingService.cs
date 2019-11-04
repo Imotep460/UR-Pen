@@ -252,13 +252,11 @@ public static class SavingService
         {
             Debug.LogWarningFormat("Data at {0} does not contain any points.");
         }
-        else if (pointsCount > 0)
+        
+        for (int i = 0; i < pointsCount; i++)
         {
-            for (int i = 0; i < pointsCount; i++)
-            {
-                var point = (string)points[i];
-                TestSimulation.pointsStringList.Add(point);
-            }
+            var point = (string)points[i];
+            TestSimulation.pointsStringList.Add(point);
         }
 
         // Find all objects in the scene and load them.

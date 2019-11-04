@@ -37,7 +37,7 @@ public class ViewManager : MonoBehaviour
     public void saveGame()
     {
         // Save the game to a file called "SaveGame.json"
-        SavingService.SaveGame("SaveGame");
+        SavingService.SaveGame("SaveGame.json");
     }
 
     /// <summary>
@@ -47,6 +47,6 @@ public class ViewManager : MonoBehaviour
     /// <param name="fileName"></param>
     public void loadGame()
     {
-        SavingService.LoadGame("SaveGame");
+        SavingService.LoadGame("SaveGame.json");
     }
 }

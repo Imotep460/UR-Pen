@@ -48,7 +48,7 @@ public class TestSimulation : MonoBehaviour
         populateLists();
         new WaitForSeconds(1);
         // Build the list of strings so it's ready to be saved to the Json savefile later.
-        //buildStringList();
+        buildStringList();
         // Make sure the waypointIndex is set to 0 at start
         waypointIndex = 0;
 
