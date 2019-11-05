@@ -44,14 +44,14 @@ public class TestSimulation : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 0;
         // Call to populateLists method at start to populate the ppintsPosition and pointsRotation lists.
         populateLists();
         new WaitForSeconds(1);
         // Build the list of strings so it's ready to be saved to the Json savefile later.
-        buildStringList();
+        //buildStringList();
         // Make sure the waypointIndex is set to 0 at start
         waypointIndex = 0;
-
         // Set the start vector3 position equal item 0 in pointsPosition list.
         targetPosition = pointsPosition[0];
         // Set the Start Quaternion rotation equal item 0 in pointsRotation list.
@@ -112,6 +112,8 @@ public class TestSimulation : MonoBehaviour
         {
             Debug.LogFormat("You are at the beginning of the list!");
             waypointIndex = 0;
+            targetPosition = pointsPosition[0];
+            targetRotation = pointsRotation[0];
         }
     }
 
@@ -131,6 +133,8 @@ public class TestSimulation : MonoBehaviour
         {
             Debug.LogFormat("You are at the end of the list!");
             waypointIndex = pointsPosition.Count - 1;
+            targetPosition = pointsPosition[pointsPosition.Count - 1];
+            targetRotation = pointsRotation[pointsRotation.Count - 1];
         }
     }
 
@@ -180,6 +184,11 @@ public class TestSimulation : MonoBehaviour
             // Create and format a string and add it to the points list.
             pointsStringList.Add(string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}", xp, yp, zp, xr, yr, zr, wr));
         }
+    }
+
+    private void ReadFromFile()
+    {
+
     }
 
     //void generateLists()

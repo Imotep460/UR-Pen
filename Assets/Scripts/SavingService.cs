@@ -235,7 +235,13 @@ public static class SavingService
                 return false;
             }
 
-            SceneManager.SetActiveScene(activeScene);
+            //// Not excatly sure why but the line below "SceneManager.SetActiveScene(activeScene)" causes a bug
+            //// "ArgumentException: SceneManager.SetActiveScene failed; scene GetPenUniverse" is not loaded",
+            //// causing the GameObject to spawn in the location it is placed in, in the editor.
+            //// I am not sure why this happens (might have to wait a frame between loading each scene (see above) to set ActiveScene)
+            //// Until fixed "SceneManager.SetActiveScene(activeScene)" stays as a comment.
+            //SceneManager.SetActiveScene(activeScene);
+            Debug.Log("Scene was loaded");
         }
         else
         {
@@ -247,16 +253,12 @@ public static class SavingService
         // Get the list of points.
         var points = data[POINTS_STRING_KEY];
         int pointsCount = points.Count;
+        var point = (string)points[0];
+        Debug.Log(point);
 
         if (pointsCount == 0)
         {
             Debug.LogWarningFormat("Data at {0} does not contain any points.");
-        }
-        
-        for (int i = 0; i < pointsCount; i++)
-        {
-            var point = (string)points[i];
-            TestSimulation.pointsStringList.Add(point);
         }
 
         // Find all objects in the scene and load them.
