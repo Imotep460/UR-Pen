@@ -41,23 +41,30 @@ public class TestSimulation : MonoBehaviour
     // string.format(pointPosition.x, pointPosition.y, pointPosition.z, pointRotation.x, pointRotation.y, pointRotation.z, pointRotation.w)
     public static List<string> pointsStringList = new List<string>();
 
+    // Get the list of loaded points.
+    public static List<string> loadedPoints = SavingService.LOADED_POINTS;
+
+    // Awake is called before any Start methods, Awake (like Start) is called only once.
+    private void Awake()
+    {
+        Time.timeScale = 0;        
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 0;
+        ReadFromFile();
         // Call to populateLists method at start to populate the ppintsPosition and pointsRotation lists.
         populateLists();
         new WaitForSeconds(1);
         // Build the list of strings so it's ready to be saved to the Json savefile later.
-        //buildStringList();
+        buildStringList();
         // Make sure the waypointIndex is set to 0 at start
         waypointIndex = 0;
         // Set the start vector3 position equal item 0 in pointsPosition list.
         targetPosition = pointsPosition[0];
         // Set the Start Quaternion rotation equal item 0 in pointsRotation list.
         targetRotation = pointsRotation[0];
-
-        Debug.Log(pointsStringList[0]);
     }
 
     // Update is called once per frame
@@ -186,9 +193,23 @@ public class TestSimulation : MonoBehaviour
         }
     }
 
-    private void ReadFromFile()
+    private bool ReadFromFile()
     {
-
+        var loadListCount = loadedPoints.Count;
+        if (loadListCount == 0)
+        {
+            Debug.LogWarningFormat("There is no string in the list!");
+            return false;
+        }
+        else
+        {
+            for (int i = 0; i < loadListCount; i++)
+            {
+                var pointTemp = loadedPoints[i];
+                Debug.LogFormat("pointTemp = {0} point number = {1}", pointTemp, i);
+            }
+            return true;
+        }
     }
 
     //void generateLists()

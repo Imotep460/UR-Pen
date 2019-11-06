@@ -37,6 +37,8 @@ public static class SavingService
 
     private const string POINTS_STRING_KEY = "points";
 
+    public static List<string> LOADED_POINTS = new List<string>();
+
     // A reference to the delegate that runs after the scene loads,
     // which performs the object state restoration.
     static UnityEngine.Events.UnityAction<Scene, LoadSceneMode>
@@ -120,17 +122,27 @@ public static class SavingService
         // Store the name of the active scene
         result[ACTIVE_SCENE_KEY] = SceneManager.GetActiveScene().name;
 
-        var points = new JsonData();
-
+        // First check to see if TestSimulation.pointsStringList contains any points at all.
         var pointCount = TestSimulation.pointsStringList.Count();
 
-        for (int i = 0; i < pointCount; i++)
+        // If TestSimulation.pointsStringList does NOT contain any points/strings output an warning message.
+        if (pointCount == 0)
         {
-            var point = TestSimulation.pointsStringList[i];
-            points.Add(point);
+            Debug.LogWarning("There is no points in pointsStringList");
         }
+        else
+        {
+            // If there are points/strings in TestSimulation.pointsStringList, convert them to json for storage in file.
+            var points = new JsonData();
+            for (int i = 0; i < pointCount; i++)
+            {
+                var point = TestSimulation.pointsStringList[i];
+                points.Add(point);
+            }
 
-        result[POINTS_STRING_KEY] = points;
+            // Store the points/strings.
+            result[POINTS_STRING_KEY] = points;
+        }
 
         // We've now finished generating the save data, and it's now time to write it to the disk.
 
@@ -253,12 +265,19 @@ public static class SavingService
         // Get the list of points.
         var points = data[POINTS_STRING_KEY];
         int pointsCount = points.Count;
-        var point = (string)points[0];
-        Debug.Log(point);
 
+        // Check if there are points in the save file.
         if (pointsCount == 0)
         {
             Debug.LogWarningFormat("Data at {0} does not contain any points.");
+        }
+        else
+        {
+            // Split the points and add them to a List of strings.
+            for (int i = 0; i < pointsCount; i++)
+            {
+                LOADED_POINTS.Add((string)points[i]);
+            }
         }
 
         // Find all objects in the scene and load them.
