@@ -111,6 +111,7 @@ public class TestSimulation : MonoBehaviour
         // Check to see if waypointIndex is 0 and user therefore at beginning of list
         if (waypointIndex > 0)
         {
+            // Lower the waypointIndex
             waypointIndex--;
             targetPosition = pointsPosition[waypointIndex];
             targetRotation = pointsRotation[waypointIndex];
@@ -118,6 +119,7 @@ public class TestSimulation : MonoBehaviour
         else if (waypointIndex <= 0)
         {
             Debug.LogFormat("You are at the beginning of the list!");
+            // To make sure that the waypointIndex does not become negative, set here the waypointIndex to 0.
             waypointIndex = 0;
             targetPosition = pointsPosition[0];
             targetRotation = pointsRotation[0];
@@ -139,6 +141,7 @@ public class TestSimulation : MonoBehaviour
         else if (waypointIndex >= pointsPosition.Count - 1)
         {
             Debug.LogFormat("You are at the end of the list!");
+            // Make sure that the waypointIndex does not keep increasing endlessly, set it to the max value.
             waypointIndex = pointsPosition.Count - 1;
             targetPosition = pointsPosition[pointsPosition.Count - 1];
             targetRotation = pointsRotation[pointsRotation.Count - 1];
@@ -178,6 +181,7 @@ public class TestSimulation : MonoBehaviour
 
     public void buildStringList()
     {
+        // Run through the list of points.
         for (int i = 0; i < pointsPosition.Count; i++)
         {
             // Separate the different values in each Vector3 in pointsPosition and Quaternion in pointsRotation
@@ -195,12 +199,18 @@ public class TestSimulation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Check if TestSimulator.cs loadedStrings contains any strings,
+    /// if loadedStrings does contain strings then decrypt these strings into float values,
+    /// and create new Vector3 pointsPositions & Quaternion pointsRotations using these values.
+    /// </summary>
+    /// <returns></returns>
     private bool ReadFromFile()
     {
         // Check if loadedStrings contains any strings.
         if (loadedStrings.Count - 1 < 0)
         {
-            Debug.LogWarningFormat("There is no strings in the list!");
+            Debug.LogWarningFormat("Loading points failed! There is no strings in the 'points' list!");
             return false;
         }
         else
@@ -230,8 +240,6 @@ public class TestSimulation : MonoBehaviour
                 // Now that Unity can understand our values we can create new Vector3's and Quaternion's.
                 pointsPosition.Add(new Vector3(x, y, z));
                 pointsRotation.Add(new Quaternion(xr, yr, zr, wr));
-
-                Debug.LogFormat("vector = {0}, Quaternion = {1}", pointsPosition[i].ToString(), pointsRotation[i].ToString());
             }
             Debug.Log("All data read from file.");
             return true;

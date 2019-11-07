@@ -75,13 +75,10 @@
     <Compile Include="Assets\LitJSON\src\LitJson\ParserToken.cs" />
     <Compile Include="Assets\Scripts\ButtonYUp.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
-    <Compile Include="Assets\Scripts\Points.cs" />
     <Compile Include="Assets\Scripts\SaveableBehavior.cs" />
     <Compile Include="Assets\Scripts\SavingService.cs" />
-    <Compile Include="Assets\Scripts\SerializeTest.cs" />
     <Compile Include="Assets\Scripts\Simulation.cs" />
     <Compile Include="Assets\Scripts\Surrogates.cs" />
-    <Compile Include="Assets\Scripts\TestCode.cs" />
     <Compile Include="Assets\Scripts\TestSimulation.cs" />
     <Compile Include="Assets\Scripts\TransformSaver.cs" />
     <Compile Include="Assets\Scripts\UIController.cs" />

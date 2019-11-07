@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// To use this script, add a TransforSaver component to your Game Object.
-/// It will automatically be inclded in saved games, and it's state will be restored when the game is loaded.
+/// To use this script, add a TransforSaver component to your GameObject.
+/// It will automatically be included in saved games, and it's state will be restored when the game is loaded.
 /// </summary>
 public class TransformSaver : SaveableBehavior
 {
