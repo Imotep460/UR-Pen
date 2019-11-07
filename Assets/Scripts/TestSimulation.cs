@@ -155,6 +155,7 @@ public class TestSimulation : MonoBehaviour
     //{
     //    Vector3 rotationsVector;
 
+    //    // Create custom Vector3's and custom Quaternion's for testing purposes.
     //    pointsPosition.Add(new Vector3(0, 1, 0));
     //    pointsPosition.Add(new Vector3(1, 1, 0));
     //    pointsPosition.Add(new Vector3(1, 1, 1));
