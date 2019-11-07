@@ -123,7 +123,7 @@ public static class SavingService
         result[ACTIVE_SCENE_KEY] = SceneManager.GetActiveScene().name;
 
         // First check to see if TestSimulation.pointsStringList contains any points at all.
-        var pointCount = TestSimulation.pointsStringList.Count();
+        var pointCount = TestSimulation.stringsToSave.Count();
 
         // If TestSimulation.pointsStringList does NOT contain any points/strings output an warning message.
         if (pointCount == 0)
@@ -136,7 +136,7 @@ public static class SavingService
             var points = new JsonData();
             for (int i = 0; i < pointCount; i++)
             {
-                var point = TestSimulation.pointsStringList[i];
+                var point = TestSimulation.stringsToSave[i];
                 points.Add(point);
             }
 

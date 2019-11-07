@@ -39,10 +39,10 @@ public class TestSimulation : MonoBehaviour
 
     // To save the points I create a List<string> where I add a string by the following format:
     // string.format(pointPosition.x, pointPosition.y, pointPosition.z, pointRotation.x, pointRotation.y, pointRotation.z, pointRotation.w)
-    public static List<string> pointsStringList = new List<string>();
+    public static List<string> stringsToSave = new List<string>();
 
     // Get the list of loaded points.
-    public static List<string> loadedPoints = SavingService.LOADED_POINTS;
+    public static List<string> loadedStrings = SavingService.LOADED_POINTS;
 
     // Awake is called before any Start methods, Awake (like Start) is called only once.
     private void Awake()
@@ -55,7 +55,7 @@ public class TestSimulation : MonoBehaviour
     {
         ReadFromFile();
         // Call to populateLists method at start to populate the ppintsPosition and pointsRotation lists.
-        populateLists();
+        //populateLists();
         new WaitForSeconds(1);
         // Build the list of strings so it's ready to be saved to the Json savefile later.
         buildStringList();
@@ -149,83 +149,91 @@ public class TestSimulation : MonoBehaviour
     /// Populate the pointsPosition list with Vector3's and the pointsRotation with Quaternion's with custom data.
     /// Recomended to call this method in Start/Awake, for a smooth startup.
     /// Do NOT use with a working save system.
-    /// For testing purposes.
+    /// Use this method to test writing to file.
     /// </summary>
-    void populateLists()
-    {
-        Vector3 rotationsVector;
+    //void populateLists()
+    //{
+    //    Vector3 rotationsVector;
 
-        pointsPosition.Add(new Vector3(0, 1, 0));
-        pointsPosition.Add(new Vector3(1, 1, 0));
-        pointsPosition.Add(new Vector3(1, 1, 1));
-        pointsPosition.Add(new Vector3(2, 2, 2));
-        pointsPosition.Add(new Vector3(3, 3, 3));
-        pointsPosition.Add(new Vector3(0, 0, 0));
-        pointsPosition.Add(new Vector3((float)7.5, 0, 0));
-        pointsPosition.Add(new Vector3(14, 0, 0));
-        pointsRotation.Add(Quaternion.Euler(0, 0, 0));
-        pointsRotation.Add(Quaternion.Euler(45, 0, 0));
-        pointsRotation.Add(Quaternion.Euler(0, 0, 0));
-        // When NOT using Quaternion.Euler remember to convert input to float and add a w with value=1 as seen below.
-        pointsRotation.Add(new Quaternion((float)0.45, 0, 0, 1));
-        rotationsVector = new Vector3(25, 0, 0);
-        pointsRotation.Add(Quaternion.Euler(rotationsVector));
-        pointsRotation.Add(Quaternion.Euler(0, 0, 0));
-        pointsRotation.Add(Quaternion.Euler(45, 0, 0));
-        pointsRotation.Add(Quaternion.Euler(-45, 0, 0));
-    }
+    //    pointsPosition.Add(new Vector3(0, 1, 0));
+    //    pointsPosition.Add(new Vector3(1, 1, 0));
+    //    pointsPosition.Add(new Vector3(1, 1, 1));
+    //    pointsPosition.Add(new Vector3(2, 2, 2));
+    //    pointsPosition.Add(new Vector3(3, 3, 3));
+    //    pointsPosition.Add(new Vector3(0, 0, 0));
+    //    pointsPosition.Add(new Vector3((float)7.5, 0, 0));
+    //    pointsPosition.Add(new Vector3(14, 0, 0));
+    //    pointsRotation.Add(Quaternion.Euler(0, 0, 0));
+    //    pointsRotation.Add(Quaternion.Euler(45, 0, 0));
+    //    pointsRotation.Add(Quaternion.Euler(0, 0, 0));
+    //    // When NOT using Quaternion.Euler remember to convert input to float and add a w with value=1 as seen below.
+    //    pointsRotation.Add(new Quaternion((float)0.45, 0, 0, 1));
+    //    rotationsVector = new Vector3(25, 0, 0);
+    //    pointsRotation.Add(Quaternion.Euler(rotationsVector));
+    //    pointsRotation.Add(Quaternion.Euler(0, 0, 0));
+    //    pointsRotation.Add(Quaternion.Euler(45, 0, 0));
+    //    pointsRotation.Add(Quaternion.Euler(-45, 0, 0));
+    //}
 
     public void buildStringList()
     {
         for (int i = 0; i < pointsPosition.Count; i++)
         {
             // Separate the different values in each Vector3 in pointsPosition and Quaternion in pointsRotation
-            float xp = pointsPosition[i].x;
-            float yp = pointsPosition[i].y;
-            float zp = pointsPosition[i].z;
-            float xr = pointsRotation[i].x;
-            float yr = pointsRotation[i].y;
-            float zr = pointsRotation[i].z;
-            float wr = pointsRotation[i].w;
+            string xp = pointsPosition[i].x.ToString();
+            string yp = pointsPosition[i].y.ToString();
+            string zp = pointsPosition[i].z.ToString();
+            string xr = pointsRotation[i].x.ToString();
+            string yr = pointsRotation[i].y.ToString();
+            string zr = pointsRotation[i].z.ToString();
+            string wr = pointsRotation[i].w.ToString();
 
             // Create and format a string and add it to the points list.
-            pointsStringList.Add(string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}", xp, yp, zp, xr, yr, zr, wr));
+            stringsToSave.Add(string.Format("{0},{1},{2},{3},{4},{5},{6}", xp.Replace(",", "."), yp.Replace(",", "."), zp.Replace(",", "."), xr.Replace(",", "."), yr.Replace(",", "."), zr.Replace(",", "."), wr.Replace(",", ".")));
+            //pointsStringList.Add(string.Format("{0}, {1}", vector, quaternion));
         }
     }
 
     private bool ReadFromFile()
     {
-        var loadListCount = loadedPoints.Count;
-        if (loadListCount == 0)
+        // Check if loadedStrings contains any strings.
+        if (loadedStrings.Count - 1 < 0)
         {
-            Debug.LogWarningFormat("There is no string in the list!");
+            Debug.LogWarningFormat("There is no strings in the list!");
             return false;
         }
         else
         {
+            // Create a local variable to serve as a index for how many strings are present in loadedStrings
+            var loadListCount = loadedStrings.Count;
+
+            // Run through the loadedStrings sing loadListCount as a index.
             for (int i = 0; i < loadListCount; i++)
             {
-                var pointTemp = loadedPoints[i];
-                Debug.LogFormat("pointTemp = {0} point number = {1}", pointTemp, i);
+                // Create a temporary variable to hold loadedStrings at index i.
+                var pointsTemp = loadedStrings[i];
+
+                // Split pointsTemp into several strings at each "," (1 string = 1 value).
+                string[] pointTemp = pointsTemp.Split(","[0]);
+
+                // In order for Unity to be able to properly understand the values in each pointTemp string,
+                // we need to replace each "." with a ",".
+                float x = float.Parse(pointTemp[0].Replace(".", ","));
+                float y = float.Parse(pointTemp[1].Replace(".", ","));
+                float z = float.Parse(pointTemp[2].Replace(".", ","));
+                float xr = float.Parse(pointTemp[3].Replace(".", ","));
+                float yr = float.Parse(pointTemp[4].Replace(".", ","));
+                float zr = float.Parse(pointTemp[5].Replace(".", ","));
+                float wr = float.Parse(pointTemp[6].Replace(".", ","));
+
+                // Now that Unity can understand our values we can create new Vector3's and Quaternion's.
+                pointsPosition.Add(new Vector3(x, y, z));
+                pointsRotation.Add(new Quaternion(xr, yr, zr, wr));
+
+                Debug.LogFormat("vector = {0}, Quaternion = {1}", pointsPosition[i].ToString(), pointsRotation[i].ToString());
             }
+            Debug.Log("All data read from file.");
             return true;
         }
     }
-
-    //void generateLists()
-    //{
-    //    var vectors : Vector3[];
-
-    //    var inputFile = "";//(read the string from the file any way you want, could be www)
-    //    var lines = inputFile.Split("\n"[0]); // Gets all lines into seperate strings.
-    //    vectors = new Vector3[lines.Length];
-    //    for (int i = 0; i < lines.Length; i++)
-    //    {
-    //        var pt = lines[i].Split(","[0]); // Gets 3 parts of the vector into seperate strings.
-    //        var x = float.Parse(pt[0]);
-    //        var y = float.Parse(pt[1]);
-    //        var z = float.Parse(pt[2]);
-    //        vectors[i] = new Vector3(x, y, z);
-    //    }
-    //}
 }
