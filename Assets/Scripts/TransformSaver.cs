@@ -84,5 +84,10 @@ public class TransformSaver : SaveableBehavior
         {
             transform.localScale = DeserializeValue<Vector3>(data[LOCAL_SCALE_KEY]);
         }
+
+        // Send/save the start/spawn position and start/spawn rotation to TestSimulation,
+        // so the GameObject has access to the positions later.
+        TestSimulation.startPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
+        TestSimulation.startRotation = new Quaternion(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z, transform.localRotation.w);
     }
 }

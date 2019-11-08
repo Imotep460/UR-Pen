@@ -13,9 +13,20 @@ public class TestSimulation : MonoBehaviour
     // Field for the Text object. Meant to represent the x, y, z, w, rotation of the GameObject.
     [SerializeField]
     private TMPro.TextMeshProUGUI rotationText;
+    // Create a field to show the progression throgh the waypoints.
+    [SerializeField]
+    private TMPro.TextMeshProUGUI pointProgression;
+    // Another way of showing the progression through the waypoints.
+    [SerializeField]
+    private TMPro.TextMeshProUGUI pointProgression2;
 
     // Index used to navigate through the lists:
     private int waypointIndex;
+
+    // Create fields for the GameObjects start position and start rotation.
+    // startPosition and startRotation is set in TransformSaver.cs
+    public static Vector3 startPosition;
+    public static Quaternion startRotation;
 
     // Create list of vector3 positions
     public List<Vector3> pointsPosition = new List<Vector3>();
@@ -54,8 +65,6 @@ public class TestSimulation : MonoBehaviour
     void Start()
     {
         ReadFromFile();
-        // Call to populateLists method at start to populate the ppintsPosition and pointsRotation lists.
-        //populateLists();
         new WaitForSeconds(1);
         // Build the list of strings so it's ready to be saved to the Json savefile later.
         buildStringList();
@@ -74,6 +83,10 @@ public class TestSimulation : MonoBehaviour
         positionText.text = string.Format("Position:\n{0}", transform.position);
         // Display the current euler rotation of the GameObject. The text to appear in the Text object.
         rotationText.text = string.Format("Rotation:\n{0}", transform.rotation.eulerAngles);
+        // Display the waypoint progression.
+        pointProgression.text = string.Format("Point {0} of {1}", waypointIndex, pointsPosition.Count);
+        // Display moving from point a to point b
+        pointProgression2.text = string.Format("Point {0} => Point {1}", waypointIndex, waypointIndex + 1);
 
         // Move towards the targetPosition.
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, movementSpeed * Time.deltaTime);
@@ -83,23 +96,31 @@ public class TestSimulation : MonoBehaviour
         // Check if the GameObject is within a certain distance of the targetPosition
         if (Vector3.Distance(transform.position, targetPosition) < .00001f)
         {
-            new WaitForSeconds(1);
-            // Check to make sure that the waypointIndex is NOT bigger than than the maximum number of vector3's in pointsPosition.
-            if (waypointIndex >= pointsPosition.Count - 1)
+            if (transform.rotation != targetRotation)
             {
-                // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then reset the waypointIndex to 0.
-                waypointIndex = 0;
-                // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then pause the game.
-                Time.timeScale = 0;
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
-            else
+            else if (transform.rotation == targetRotation)
             {
-                waypointIndex++;
+                new WaitForSeconds(1);
+                // Check to make sure that the waypointIndex is NOT bigger than than the maximum number of vector3's in pointsPosition.
+                if (waypointIndex >= pointsPosition.Count - 1)
+                {
+                    // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then reset the waypointIndex to 0.
+                    waypointIndex = 0;
+                    // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then pause the game.
+                    Time.timeScale = 0;
+                }
+                else
+                {
+                    waypointIndex++;
+                }
             }
             // Set a new target position
             targetPosition = pointsPosition[waypointIndex];
             // Set a new target rotation
             targetRotation = pointsRotation[waypointIndex];
+            Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
         }
     }
 
@@ -146,6 +167,21 @@ public class TestSimulation : MonoBehaviour
             targetPosition = pointsPosition[pointsPosition.Count - 1];
             targetRotation = pointsRotation[pointsRotation.Count - 1];
         }
+    }
+
+    /// <summary>
+    /// Reset/reload the scene to the start position of the path.
+    /// </summary>
+    public void ResetScene()
+    {
+        // Reset the position and rotation of the GameObject to the Start position and start rotation.
+        transform.localPosition = startPosition;
+        transform.localRotation = startRotation;
+        // Reset the waypointIndex
+        waypointIndex = 0;
+        // Reset the targetPosition and the targetRotation at waypointIndex 0.
+        targetPosition = pointsPosition[waypointIndex];
+        targetRotation = pointsRotation[waypointIndex];
     }
 
     /// <summary>
@@ -210,7 +246,7 @@ public class TestSimulation : MonoBehaviour
         // Check if loadedStrings contains any strings.
         if (loadedStrings.Count - 1 < 0)
         {
-            Debug.LogWarningFormat("Loading points failed! There is no strings in the 'points' list!");
+            Debug.LogErrorFormat("Loading points failed! There is no strings in the 'points' list!");
             return false;
         }
         else
