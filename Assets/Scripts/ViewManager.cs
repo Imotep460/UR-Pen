@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Use ViewManager to help navigate the scenes in the project.
+/// NOTE; ViewManager.cs MUST be added a a component on a GameObject in a scene for it to work.
+/// </summary>
 public class ViewManager : MonoBehaviour
 {
     /// <summary>

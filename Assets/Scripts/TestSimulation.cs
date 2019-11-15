@@ -20,7 +20,7 @@ public class TestSimulation : MonoBehaviour
     [SerializeField]
     private TMPro.TextMeshProUGUI pointProgression2;
 
-    // Index used to navigate through the lists:
+    // Declare the index used to navigate through the lists:
     private int waypointIndex;
 
     // Create fields for the GameObjects start position and start rotation.
@@ -55,38 +55,61 @@ public class TestSimulation : MonoBehaviour
     // Get the list of loaded points.
     public static List<string> loadedStrings = SavingService.LOADED_POINTS;
 
+    // Create Object reference to the TrailRendere component on the Pen GameObject,
+    // so the TrailRenderer can be scripted/accessed.
+    private TrailRenderer tR;
+
     // Awake is called before any Start methods, Awake (like Start) is called only once.
     private void Awake()
     {
-        Time.timeScale = 0;        
+        // Pause the scene/simulation on startup.
+        Time.timeScale = 0;
+        // Get the TrailRenderer component.
+        tR = GetComponent<TrailRenderer>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        // Load and format the points from the SaveGame.json file into pointsPosition and pointsRotation lists.
         ReadFromFile();
-        new WaitForSeconds(1);
-        // Build the list of strings so it's ready to be saved to the Json savefile later.
-        buildStringList();
+
         // Make sure the waypointIndex is set to 0 at start
         waypointIndex = 0;
         // Set the start vector3 position equal item 0 in pointsPosition list.
         targetPosition = pointsPosition[0];
         // Set the Start Quaternion rotation equal item 0 in pointsRotation list.
         targetRotation = pointsRotation[0];
+
+        // To avoid the TrailRenderer making a trail from the GameObjects position in the editor to it's spawn position on scene load,
+        // we quickly clears the TrailRenderer on Start. 
+        // NOTE this does not disable the TrailRenderer it merely clears all trails made prior to calling the Clear method.
+        tR.Clear();
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Make sure the TrailRenderer is ON
+        tR.emitting = true;
+
         // Display the current position of the GameObject. The text to appear in in the Text object.
         positionText.text = string.Format("Position:\n{0}", transform.position);
         // Display the current euler rotation of the GameObject. The text to appear in the Text object.
         rotationText.text = string.Format("Rotation:\n{0}", transform.rotation.eulerAngles);
-        // Display the waypoint progression.
-        pointProgression.text = string.Format("Point {0} of {1}", waypointIndex, pointsPosition.Count);
-        // Display moving from point a to point b
-        pointProgression2.text = string.Format("Point {0} => Point {1}", waypointIndex, waypointIndex + 1);
+
+        if (waypointIndex > 0)
+        {
+            // Display the waypoint progression.
+            pointProgression.text = string.Format("Point {0} of {1}", waypointIndex, pointsPosition.Count);
+            // Display moving from point a to point b
+            pointProgression2.text = string.Format("Point {0} => Point {1}", waypointIndex, waypointIndex + 1);
+        }
+        else if (waypointIndex == 0)
+        {
+            pointProgression.text = string.Format("Start position of {0}", pointsPosition.Count);
+            pointProgression2.text = string.Format("Start position => Point {0}", waypointIndex + 1);
+        }
 
         // Move towards the targetPosition.
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, movementSpeed * Time.deltaTime);
@@ -114,63 +137,110 @@ public class TestSimulation : MonoBehaviour
                 else
                 {
                     waypointIndex++;
+                    // Output to the Unity editor console the current targetposition, targetrotation, and point x of y
+                    Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
                 }
             }
-            // Set a new target position
+            // Designate a new target position
             targetPosition = pointsPosition[waypointIndex];
-            // Set a new target rotation
+            // Designate a new target rotation
             targetRotation = pointsRotation[waypointIndex];
-            Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
         }
     }
 
     /// <summary>
     /// Get the previous waypoints position and rotation.
+    /// Move the pen backwards through the points in pointsPosition and pointsRotation lists,
+    /// eventually reaching startPosition and startRotation.
     /// </summary>
-    void getPreviousWaypoint()
+    public void getPreviousWaypoint()
     {
-        // Check to see if waypointIndex is 0 and user therefore at beginning of list
-        if (waypointIndex > 0)
+        Time.timeScale = 0;
+        // turn the TrailRenderer off as there has most likely already been created a Trail so no reason to alocate power to create a new trail on top an existing one.
+        tR.emitting = false;
+
+        // Check if the waypointIndex is indicating that the GameObject is at the beginning of the list.
+        if (waypointIndex == 0)
         {
-            // Lower the waypointIndex
-            waypointIndex--;
-            targetPosition = pointsPosition[waypointIndex];
-            targetRotation = pointsRotation[waypointIndex];
+            // If the waypointIndex is 0 and the GameObject therefore at point 0 in pointsPosition/pointsRotation lists
+            // make sure to reset the waypointIndex, så it does not go ot of bounds
+            waypointIndex = 0;
+            Debug.LogFormat("You are at the beginning of the list!!!");
+
+            // Move to the start position.
+            transform.localPosition = startPosition;
+            transform.localRotation = startRotation;
+
+            targetPosition = pointsPosition[0];
+            targetRotation = pointsRotation[0];
         }
-        else if (waypointIndex <= 0)
+        // Check to see if waypointIndex is 0 and user therefore at beginning of list
+        else if (waypointIndex > 0)
+        {
+            if(waypointIndex > 0)
+            {
+                // If the GameObject is not at the beginning of the list, move to the point at the previous waypointIndex
+                transform.localPosition = pointsPosition[waypointIndex - 1];
+                transform.localRotation = pointsRotation[waypointIndex - 1];
+
+                if (waypointIndex > 0)
+                {
+                    // Decrement the waypointIndex if the waypointIndex is bigger than 0
+                    waypointIndex--;
+                }
+                else if(waypointIndex <= 0)
+                {
+                    // If the waypointIndex is less than 0 or already is 0,
+                    // make sure to set the waypointIndex to 0 to prevent waypointIndex going out of bouunds.
+                    waypointIndex = 0;
+                }
+            }
+        }
+        else if (waypointIndex < 0)
         {
             Debug.LogFormat("You are at the beginning of the list!");
             // To make sure that the waypointIndex does not become negative, set here the waypointIndex to 0.
             waypointIndex = 0;
-            targetPosition = pointsPosition[0];
-            targetRotation = pointsRotation[0];
         }
     }
 
     /// <summary>
     /// Get the next waypoints position and rotation.
     /// </summary>
-    void getNextWaypoint()
+    public void getNextWaypoint()
     {
-        // Check if the user has reached the final point in the pointsPosition list, and therefore the end of the line.
-        if (waypointIndex <= pointsPosition.Count - 1)
+        // Check to see if the GameObject is currently transitioning in between 2 points.
+        if (transform.position != targetPosition)
         {
-            waypointIndex++;
-            targetPosition = pointsPosition[waypointIndex];
-            targetRotation = pointsRotation[waypointIndex];
+            // If the GameObject is transitioning between 2 points instantly go to the targetPosition/targetRotation.
+            transform.localPosition = targetPosition;
+            transform.localRotation = targetRotation;
         }
-        else if (waypointIndex >= pointsPosition.Count - 1)
+        else if (transform.position == targetPosition)
         {
-            Debug.LogFormat("You are at the end of the list!");
-            // Make sure that the waypointIndex does not keep increasing endlessly, set it to the max value.
-            waypointIndex = pointsPosition.Count - 1;
-            targetPosition = pointsPosition[pointsPosition.Count - 1];
-            targetRotation = pointsRotation[pointsRotation.Count - 1];
+            // If the GameObject is NOT transitioning between 2 points check if the GameObject has reached the end of the list.
+            if (waypointIndex < pointsPosition.Count - 1)
+            {
+                // If the GameObject has not reached the end of the list, simply go to the next point in the list.
+                transform.localPosition = pointsPosition[waypointIndex + 1];
+                transform.localRotation = pointsRotation[waypointIndex + 1];
+
+                // Increment the waypointIndex so it is up to date with GameObjects position,
+                // relative to which point in pointsPosition/pointsRotation the GameObject has reached.
+                waypointIndex++;
+            }
+            else if(waypointIndex >= pointsPosition.Count - 1)
+            {
+                // If the GameObject has reached the end of the list send a message to the console,
+                // and make sure that the waypointIndex does not go out of bounds
+                Debug.LogFormat("You have reached the end of the list!");
+                waypointIndex = pointsPosition.Count - 1;
+            }
         }
     }
 
     /// <summary>
-    /// Reset/reload the scene to the start position of the path.
+    /// Reset/reload the scene to the start position of the path. Get the startPosition and startRotation from TransformSaver.cs
     /// </summary>
     public void ResetScene()
     {
@@ -182,6 +252,10 @@ public class TestSimulation : MonoBehaviour
         // Reset the targetPosition and the targetRotation at waypointIndex 0.
         targetPosition = pointsPosition[waypointIndex];
         targetRotation = pointsRotation[waypointIndex];
+
+        // Clear the Trail on reset.
+        tR.Clear();
+        Time.timeScale = 0;
     }
 
     /// <summary>
