@@ -10,52 +10,52 @@ public class TestSimulation : MonoBehaviour
     // Drag a TextMeshPro text object to this field in the inspector
     [SerializeField]
     private TMPro.TextMeshProUGUI positionText;
-    // Field for the Text object. Meant to represent the x, y, z, w, rotation of the GameObject.
+    // Cast for the Text object. Meant to represent the x, y, z, w, rotation of the GameObject.
     [SerializeField]
     private TMPro.TextMeshProUGUI rotationText;
-    // Create a field to show the progression throgh the waypoints.
+    // Cast a field to show the progression throgh the waypoints.
     [SerializeField]
     private TMPro.TextMeshProUGUI pointProgression;
     // Another way of showing the progression through the waypoints.
     [SerializeField]
     private TMPro.TextMeshProUGUI pointProgression2;
 
-    // Declare the index used to navigate through the lists:
+    // Cast the index used to navigate through the lists:
     private int waypointIndex;
 
-    // Create fields for the GameObjects start position and start rotation.
+    // Cast fields for the GameObjects start position and start rotation.
     // startPosition and startRotation is set in TransformSaver.cs
     public static Vector3 startPosition;
     public static Quaternion startRotation;
 
-    // Create list of vector3 positions
+    // Cast list of vector3 positions
     public List<Vector3> pointsPosition = new List<Vector3>();
-    // Create list of Quaternion rotations;
+    // Cast list of Quaternion rotations;
     public List<Quaternion> pointsRotation = new List<Quaternion>();
 
-    // Get the target Vector3.
+    // Cast the target Vector3.
     private Vector3 targetPosition;
-    // Field for the targetRotation/target Quarternion
+    // Cast for the targetRotation/target Quarternion
     private Quaternion targetRotation;
 
-    // Field for movementSpeed variable to increase or decrease the movement speed of the GameObject.
+    // Cast for movementSpeed variable to increase or decrease the movement speed of the GameObject.
     // If the movementSpeed is 0 then then GameObject will not move,
     // and if the movementSpeed is negative then the GameObject will never reach it's target position.
     // Therefore recommended that the movementSpeed is kept positive.
     [SerializeField]
     private float movementSpeed;
-    // Field for rotationSpeed variable to increase or decrease the rotation speed of the GameObject.
+    // Cast for rotationSpeed variable to increase or decrease the rotation speed of the GameObject.
     [SerializeField]
     private float rotationSpeed;
 
-    // To save the points I create a List<string> where I add a string by the following format:
+    // To save the points I Cast a List<string> where I add a string by the following format:
     // string.format(pointPosition.x, pointPosition.y, pointPosition.z, pointRotation.x, pointRotation.y, pointRotation.z, pointRotation.w)
     public static List<string> stringsToSave = new List<string>();
 
-    // Get the list of loaded points.
+    // Cast the list of loaded points.
     public static List<string> loadedStrings = SavingService.LOADED_POINTS;
 
-    // Create Object reference to the TrailRendere component on the Pen GameObject,
+    // Cast Object reference to the TrailRendere component on the Pen GameObject,
     // so the TrailRenderer can be scripted/accessed.
     private TrailRenderer tR;
 
@@ -138,7 +138,7 @@ public class TestSimulation : MonoBehaviour
                 {
                     waypointIndex++;
                     // Output to the Unity editor console the current targetposition, targetrotation, and point x of y
-                    Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
+                    //Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
                 }
             }
             // Designate a new target position
@@ -156,51 +156,61 @@ public class TestSimulation : MonoBehaviour
     public void getPreviousWaypoint()
     {
         Time.timeScale = 0;
+
         // turn the TrailRenderer off as there has most likely already been created a Trail so no reason to alocate power to create a new trail on top an existing one.
         tR.emitting = false;
 
-        // Check if the waypointIndex is indicating that the GameObject is at the beginning of the list.
-        if (waypointIndex == 0)
-        {
-            // If the waypointIndex is 0 and the GameObject therefore at point 0 in pointsPosition/pointsRotation lists
-            // make sure to reset the waypointIndex, så it does not go ot of bounds
-            waypointIndex = 0;
-            Debug.LogFormat("You are at the beginning of the list!!!");
+        Vector3 tempPoint = pointsPosition[Math.Max(0, waypointIndex - 1)];
+        Quaternion tempRotation = pointsRotation[Math.Max(0, waypointIndex - 1)];
 
-            // Move to the start position.
-            transform.localPosition = startPosition;
-            transform.localRotation = startRotation;
+        // Check if the GameObject is at the startPosition.
+        if (transform.position == startPosition)
+        {
+            Debug.LogFormat("The GameObject is at the startPosition, nothing to do");
 
             targetPosition = pointsPosition[0];
             targetRotation = pointsRotation[0];
+            waypointIndex = 0;
+            return;
         }
-        // Check to see if waypointIndex is 0 and user therefore at beginning of list
+
+        if (waypointIndex <= 0)
+        {
+            Debug.LogFormat("something something");
+            tempPoint = pointsPosition[0];
+            tempRotation = pointsRotation[0];
+        }
         else if (waypointIndex > 0)
         {
-            if(waypointIndex > 0)
-            {
-                // If the GameObject is not at the beginning of the list, move to the point at the previous waypointIndex
-                transform.localPosition = pointsPosition[waypointIndex - 1];
-                transform.localRotation = pointsRotation[waypointIndex - 1];
+            tempPoint = pointsPosition[waypointIndex - 1];
+            tempRotation = pointsRotation[waypointIndex - 1];
+        }
 
-                if (waypointIndex > 0)
-                {
-                    // Decrement the waypointIndex if the waypointIndex is bigger than 0
-                    waypointIndex--;
-                }
-                else if(waypointIndex <= 0)
-                {
-                    // If the waypointIndex is less than 0 or already is 0,
-                    // make sure to set the waypointIndex to 0 to prevent waypointIndex going out of bouunds.
-                    waypointIndex = 0;
-                }
+        // Check if GameObject is transitioning between 2 points.
+        if (transform.position != tempPoint)
+        {
+            // If transform.position is NOT at tempPoint and waypointIndex is 0 go to startPosition and startRotation.
+            // As the GameObject MUST be transitioning from startPosition to pointsPosition[0].
+            if (waypointIndex <= 0)
+            {
+                transform.localPosition = startPosition;
+                transform.localRotation = startRotation;
+
+                targetPosition = pointsPosition[0];
+                targetRotation = pointsRotation[0];
+                waypointIndex = 0;
+            }
+            // If the waypointIndex is bigger than 0 the GameObject MUST be transitioning between points in the pointsPosition list.
+            else if (waypointIndex > 0)
+            {
+                // Simply move the GameObject back to the previous targetPosition.
+                transform.localPosition = pointsPosition[Math.Max(0, waypointIndex - 1)];
+                transform.localRotation = pointsRotation[Math.Max(0, waypointIndex - 1)];
             }
         }
-        else if (waypointIndex < 0)
+        else if (transform.position == tempPoint)
         {
-            Debug.LogFormat("You are at the beginning of the list!");
-            // To make sure that the waypointIndex does not become negative, set here the waypointIndex to 0.
-            waypointIndex = 0;
+
         }
     }
 
