@@ -289,6 +289,9 @@ public class TestSimulation : MonoBehaviour
 
         // Clear the Trail on reset.
         tR.Clear();
+        // Reset the endReached to false as in the Awake method.
+        endReached = false;
+        // pase the scene until the user presses start.
         Time.timeScale = 0;
     }
 
