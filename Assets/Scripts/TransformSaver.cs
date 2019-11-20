@@ -87,6 +87,11 @@ public class TransformSaver : SaveableBehavior
 
         // Send/save the start/spawn position and start/spawn rotation to TestSimulation,
         // so the GameObject has access to the positions later.
+
+        // The UR robot gives vector positions in meters, as such the Vector3 positions in "points" in the SaveGame.json file seems very small,
+        // to small to give an acurate reading of whats going on, so we add 10 to the start position here in TransformSaver.cs and
+        // to the vector positions in ReadFromFile method in TestSimulation.cs
+
         TestSimulation.startPosition = new Vector3(transform.localPosition.x * 10, transform.localPosition.y * 10, transform.localPosition.z * 10);
         TestSimulation.startRotation = new Quaternion(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z, transform.localRotation.w);
     }

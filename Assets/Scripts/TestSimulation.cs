@@ -59,9 +59,14 @@ public class TestSimulation : MonoBehaviour
     // so the TrailRenderer can be scripted/accessed.
     private TrailRenderer tR;
 
+    // Cast a bool to check if the GameObject has reached the end of the pointsPosition list.
+    bool endReached;
+
     // Awake is called before any Start methods, Awake (like Start) is called only once.
     private void Awake()
     {
+        // On Awake set endReached to false.
+        endReached = false;
         // Pause the scene/simulation on startup.
         Time.timeScale = 0;
         // Get the TrailRenderer component.
@@ -117,39 +122,53 @@ public class TestSimulation : MonoBehaviour
 
         // Move towards the targetPosition.
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, movementSpeed * Time.deltaTime);
-        // Rotate towards the target rotation.
+
+        // As Unity expects Queternions to be normalized we normalize the targetRotation.
         targetRotation.Normalize();
+
+        // Rotate towards the target rotation.
+        // We can now Slerp to the newly Normalized targetRotation Queternion
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
-        // Check if the GameObject is within a certain distance of the targetPosition
-        if (Vector3.Distance(transform.position, targetPosition) < .00001f)
+        if (endReached == false)
         {
-            if (transform.rotation != targetRotation)
+            // Check if the GameObject is within a certain distance of the targetPosition
+            if (Vector3.Distance(transform.position, targetPosition) < .00001f)
             {
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            }
-            else if (transform.rotation == targetRotation)
-            {
-                new WaitForSeconds(1);
-                // Check to make sure that the waypointIndex is NOT bigger than than the maximum number of vector3's in pointsPosition.
-                if (waypointIndex >= pointsPosition.Count - 1)
+                if (transform.rotation != targetRotation)
                 {
-                    // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then reset the waypointIndex to 0.
-                    waypointIndex = 0;
-                    // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then pause the game.
-                    Time.timeScale = 0;
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                 }
-                else
+                else if (transform.rotation == targetRotation)
                 {
-                    waypointIndex++;
-                    // Output to the Unity editor console the current targetposition, targetrotation, and point x of y
-                    Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
+                    new WaitForSeconds(1);
+                    // Check to make sure that the waypointIndex is NOT bigger than than the maximum number of vector3's in pointsPosition.
+                    if (waypointIndex >= pointsPosition.Count - 1)
+                    {
+                        // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then reset the waypointIndex to 0.
+                        waypointIndex = 0;
+                        // If the waypointIndex is bigger than or equal to the total number of Vector3's in pointsPosition then pause the game.
+                        //Time.timeScale = 0;
+                        // End of pointsPosition list reached therefore endReached is now true
+                        endReached = true;
+                    }
+                    else
+                    {
+                        waypointIndex++;
+                        // Output to the Unity editor console the current targetposition, targetrotation, and point x of y
+                        Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
+                    }
                 }
+                // Designate a new target position
+                targetPosition = pointsPosition[waypointIndex];
+                // Designate a new target rotation
+                targetRotation = pointsRotation[waypointIndex];
             }
-            // Designate a new target position
-            targetPosition = pointsPosition[waypointIndex];
-            // Designate a new target rotation
-            targetRotation = pointsRotation[waypointIndex];
+        }
+        else if (endReached == true)
+        {
+            targetPosition = transform.position;
+            targetRotation = transform.rotation;
         }
     }
 
@@ -304,6 +323,12 @@ public class TestSimulation : MonoBehaviour
     //    pointsRotation.Add(Quaternion.Euler(-45, 0, 0));
     //}
 
+    /// <summary>
+    /// buildStringList breaks down the points in the pointsPosition and pointsRotation lists into x, y, z values
+    /// and formats these values into strings which is then added to stringsToSave list.
+    /// Once buildStringList has finished running and the strings added to stringsToSave list SavingService.cs
+    /// should be able to save the points in a json file.
+    /// </summary>
     public void buildStringList()
     {
         // Run through the list of points.
@@ -320,7 +345,6 @@ public class TestSimulation : MonoBehaviour
 
             // Create and format a string and add it to the points list.
             stringsToSave.Add(string.Format("{0},{1},{2},{3},{4},{5},{6}", xp.Replace(",", "."), yp.Replace(",", "."), zp.Replace(",", "."), xr.Replace(",", "."), yr.Replace(",", "."), zr.Replace(",", "."), wr.Replace(",", ".")));
-            //pointsStringList.Add(string.Format("{0}, {1}", vector, quaternion));
         }
     }
 
@@ -363,6 +387,11 @@ public class TestSimulation : MonoBehaviour
                 float wr = float.Parse(pointTemp[6].Replace(".", ","));
 
                 // Now that Unity can understand our values we can create new Vector3's and Quaternion's.
+
+                // The UR robot gives vector positions in meters, as such the Vector3 positions in "points" in the SaveGame.json file seems very small,
+                // too small to give an acurate reading of whats going on, so we add 10 to the start position here in ReadFromFile method and
+                // to the vector positions in LoadromData method in TransfromSaver.cs
+
                 pointsPosition.Add(new Vector3(x * 10, y * 10, z * 10));
                 pointsRotation.Add(new Quaternion(xr, yr, zr, wr));
             }
