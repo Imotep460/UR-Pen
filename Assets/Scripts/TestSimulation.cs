@@ -326,6 +326,7 @@ public class TestSimulation : MonoBehaviour
     //    pointsRotation.Add(Quaternion.Euler(-45, 0, 0));
     //}
 
+
     /// <summary>
     /// buildStringList breaks down the points in the pointsPosition and pointsRotation lists into x, y, z values
     /// and formats these values into strings which is then added to stringsToSave list.
