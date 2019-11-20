@@ -87,7 +87,7 @@ public class TransformSaver : SaveableBehavior
 
         // Send/save the start/spawn position and start/spawn rotation to TestSimulation,
         // so the GameObject has access to the positions later.
-        TestSimulation.startPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
+        TestSimulation.startPosition = new Vector3(transform.localPosition.x * 10, transform.localPosition.y * 10, transform.localPosition.z * 10);
         TestSimulation.startRotation = new Quaternion(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z, transform.localRotation.w);
     }
 }

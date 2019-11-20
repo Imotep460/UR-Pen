@@ -74,6 +74,10 @@ public class TestSimulation : MonoBehaviour
         // Load and format the points from the SaveGame.json file into pointsPosition and pointsRotation lists.
         ReadFromFile();
 
+        // Make sre GameObject starts the scene in the right position.
+        transform.localPosition = startPosition;
+        transform.localRotation = startRotation;
+
         // Make sure the waypointIndex is set to 0 at start
         waypointIndex = 0;
         // Set the start vector3 position equal item 0 in pointsPosition list.
@@ -114,6 +118,7 @@ public class TestSimulation : MonoBehaviour
         // Move towards the targetPosition.
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, movementSpeed * Time.deltaTime);
         // Rotate towards the target rotation.
+        targetRotation.Normalize();
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
         // Check if the GameObject is within a certain distance of the targetPosition
@@ -138,7 +143,7 @@ public class TestSimulation : MonoBehaviour
                 {
                     waypointIndex++;
                     // Output to the Unity editor console the current targetposition, targetrotation, and point x of y
-                    //Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
+                    Debug.LogFormat("TargetPosition = {0}, targetRotation = {1}, Point {2} of {3}", targetPosition, targetRotation, waypointIndex + 1, pointsPosition.Count);
                 }
             }
             // Designate a new target position
@@ -358,7 +363,7 @@ public class TestSimulation : MonoBehaviour
                 float wr = float.Parse(pointTemp[6].Replace(".", ","));
 
                 // Now that Unity can understand our values we can create new Vector3's and Quaternion's.
-                pointsPosition.Add(new Vector3(x, y, z));
+                pointsPosition.Add(new Vector3(x * 10, y * 10, z * 10));
                 pointsRotation.Add(new Quaternion(xr, yr, zr, wr));
             }
             Debug.Log("All data read from file.");
